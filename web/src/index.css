@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 確保背景是深色的 */
+body {
+  background-color: #0f172a;
+  color: white;
+}

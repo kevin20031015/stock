@@ -1,0 +1,20 @@
+# Python 快取
+__pycache__/
+*.pyc
+
+# 編輯器設定
+.vscode/
+.continue/
+
+# 機密與個人檔案
+.env
+1.txt
+*.log
+
+# AI 參數與模型（本地產生，不需版控）
+optimized_params.json
+models/
+
+# 系統檔案
+.DS_Store
+Thumbs.db
