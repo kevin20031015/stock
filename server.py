@@ -7,7 +7,18 @@ import random
 import yfinance as yf
 import os
 import gc
+import math # ✅ 記得加上這行
 
+# ✅ 新增這個清洗函數（放在 app = Flask(__name__) 下方即可）
+def clean_nan(obj):
+    """遞迴檢查並將資料中的 NaN 轉換為合法的 None"""
+    if isinstance(obj, dict):
+        return {k: clean_nan(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [clean_nan(v) for v in obj]
+    elif isinstance(obj, float) and math.isnan(obj):
+        return None  # 將 NaN 轉為 None (JSON 序列化後會變成 null)
+    return obj
 def save_params(symbol, params):
     """將 GA 優化後的參數存入本地 JSON 檔案"""
     file_path = "optimized_params.json"
@@ -101,7 +112,8 @@ def get_stock_data(symbol):
         elif period == '6mo': chart_data = chart_data[-120:]
         elif period == '1y': chart_data = chart_data[-250:]
         
-        return jsonify({
+        # 將原本要回傳的資料先打包
+        response_payload = {
             "chart_data": chart_data,
             "strategy": {
                 "performance": perf, "suggestion": sugg, "suggestion_color": sugg_color,
@@ -111,7 +123,10 @@ def get_stock_data(symbol):
             },
             "market_sentiment": market_sentiment,
             "news_sentiment": news_sentiment
-        })
+        }
+        
+        # 經過 clean_nan 處理後再轉為 JSON
+        return jsonify(clean_nan(response_payload))
     except Exception as e:
         print(f"API Error: {e}")
         return jsonify({"error": str(e)}), 500
